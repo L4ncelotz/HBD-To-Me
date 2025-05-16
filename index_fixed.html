@@ -1,0 +1,835 @@
+<!-- เพิ่มปุ่มสลับโหมดไว้ที่ navbar -->
+<div class="theme-toggle"></div>
+    <button id="theme-switch" class="btn-theme"></button>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AimLab ของฉัน - เทคนิคการฝึก Aim และ Settings</title>
+    <style>
+        :root {
+            --primary: #6200ee;
+            --secondary: #03dac6;
+            --dark: #121212;
+            --light: #f5f5f5;
+            --danger: #cf6679;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Kanit', sans-serif;
+        }
+        
+        body {
+            background-color: var(--dark);
+            color: var(--light);
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        header {
+            background-color: #1a1a1a;
+            padding: 20px 0;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            font-size: 28px;
+            font-weight: bold;
+            color: var(--secondary);
+        }
+        
+        .nav-links {
+            display: flex;
+            list-style: none;
+        }
+        
+        .nav-links li {
+            margin-left: 30px;
+        }
+        
+        .nav-links a {
+            color: var(--light);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s;
+            position: relative;
+        }
+        
+        .nav-links a:hover {
+            color: var(--secondary);
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background-color: var(--secondary);
+            transition: width 0.3s ease;
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+        
+        .hero {
+            padding: 80px 0;
+            text-align: center;
+            background: linear-gradient(135deg, #1a1a1a 0%, #303030 100%);
+            animation: fadeInUp 0.8s ease-out;
+        }
+        
+        .hero h1 {
+            font-size: 48px;
+            margin-bottom: 20px;
+            color: var(--secondary);
+        }
+        
+        .hero p {
+            font-size: 20px;
+            max-width: 700px;
+            margin: 0 auto;
+            color: #bbb;
+        }
+        
+        section {
+            padding: 60px 0;
+            animation: fadeInUp 0.8s ease-out;
+        }
+        
+        .section-title {
+            font-size: 36px;
+            color: var(--secondary);
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        
+        .card-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin: 40px 0;
+        }
+        
+        .card {
+            background-color: #1a1a1a;
+            border-radius: 8px;
+            overflow: hidden;
+            transition: transform 0.3s, box-shadow 0.3s;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            animation: fadeInScale 0.5s ease-out;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px) scale(1.02);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
+        }
+        
+        .card-header {
+            background-color: var(--primary);
+            color: white;
+            padding: 15px 20px;
+            font-size: 22px;
+            font-weight: bold;
+        }
+        
+        .card-body {
+            padding: 20px;
+        }
+        
+        .card-body h3 {
+            font-size: 20px;
+            margin-bottom: 10px;
+            color: var(--secondary);
+        }
+        
+        .card-body p, .card-body ul {
+            color: #bbb;
+            margin-bottom: 15px;
+        }
+        
+        .card-body ul {
+            padding-left: 20px;
+        }
+        
+        .card-body ul ul {
+            margin-left: 20px;
+            margin-top: 5px;
+            margin-bottom: 10px;
+        }
+        
+        .card-body ul ul li {
+            color: #999;
+            font-size: 0.95em;
+            margin-bottom: 5px;
+        }
+        
+        .card-body ul > li {
+            margin-bottom: 15px;
+        }
+        
+        .card-body ul > li:last-child {
+            margin-bottom: 0;
+        }
+        
+        .card-body li {
+            margin-bottom: 8px;
+        }
+        
+        .tags {
+            display: flex;
+            flex-wrap: wrap;
+            margin-top: 15px;
+        }
+        
+        .tag {
+            background-color: rgba(98, 0, 238, 0.2);
+            color: var(--secondary);
+            padding: 5px 10px;
+            border-radius: 4px;
+            margin-right: 8px;
+            margin-bottom: 8px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+        
+        .tag:hover {
+            transform: scale(1.1);
+            background-color: var(--primary);
+        }
+        
+        .settings-box {
+            background-color: #1a1a1a;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .settings-box h3 {
+            font-size: 22px;
+            color: var(--secondary);
+            margin-bottom: 15px;
+            border-bottom: 1px solid #333;
+            padding-bottom: 10px;
+        }
+        
+        .settings-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            padding: 8px 0;
+            border-bottom: 1px dashed #333;
+            animation: fadeInLeft 0.5s ease-out;
+            animation-fill-mode: both;
+        }
+        
+        .settings-row:nth-child(even) {
+            animation: fadeInRight 0.5s ease-out;
+        }
+        
+        .setting-name {
+            font-weight: bold;
+            color: #ddd;
+        }
+        
+        .setting-value {
+            color: var(--secondary);
+            font-family: 'Consolas', monospace;
+        }
+        
+        footer {
+            background-color: #121212;
+            padding: 30px 0;
+            text-align: center;
+        }
+        
+        footer p {
+            color: #777;
+        }
+        
+        .btn {
+            display: inline-block;
+            background-color: var(--primary);
+            color: white;
+            padding: 12px 25px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: background-color 0.3s;
+            cursor: pointer;
+            border: none;
+            margin-top: 20px;
+        }
+        
+        .btn:hover {
+            background-color: #7c43ea;
+        }
+        
+        @media (max-width: 768px) {
+            .navbar {
+                flex-direction: column;
+            }
+            
+            .nav-links {
+                margin-top: 20px;
+                width: 100%;
+                justify-content: space-around;
+            }
+            
+            .nav-links li {
+                margin-left: 0;
+            }
+            
+            .hero h1 {
+                font-size: 36px;
+            }
+            
+            .hero p {
+                font-size: 18px;
+            }
+            
+            .section-title {
+                font-size: 28px;
+            }
+        }
+
+        /* Loading Animation */
+        .loading {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--dark);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 0.5s;
+        }
+
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid var(--secondary);
+            border-top-color: transparent;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        .loading-text {
+            color: var(--secondary);
+            margin-top: 20px;
+            font-size: 18px;
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        @keyframes pulse {
+            0% { opacity: 0.5; }
+            50% { opacity: 1; }
+            100% { opacity: 0.5; }
+        }
+
+        /* Section Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInScale {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        @keyframes fadeInLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes fadeInRight {
+            from {
+                opacity: 0;
+                transform: translateX(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        /* References Styling */
+        .reference-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .reference-list > li {
+            margin-bottom: 20px;
+        }
+
+        .reference-list a {
+            color: var(--secondary);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            transition: color 0.3s;
+        }
+
+        .reference-list a:hover {
+            color: var(--primary);
+            text-decoration: underline;
+        }
+
+        .external-link-icon {
+            font-style: normal;
+            margin-left: 5px;
+            font-size: 0.9em;
+        }
+
+        .reference-note {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px dashed #333;
+            font-size: 0.9em;
+            color: #999;
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- เพิ่มตรงก่อน <header> -->
+    <div class="loading">
+        <div class="loading-spinner"></div>
+        <p class="loading-text">กำลังโหลด...</p>
+    </div>
+
+    <header>
+        <div class="container">
+            <nav class="navbar">
+                <div class="logo">AimLab ของฉัน</div>
+                <ul class="nav-links">
+                    <li><a href="#warm-up">Warm Up</a></li>
+                    <li><a href="#aim-training">Aim Training</a></li>
+                    <li><a href="#routines">Routines</a></li>
+                    <li><a href="#settings">Settings</a></li>
+                    <li><a href="#references">References</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <section class="hero">
+        <div class="container">
+            <h1>พัฒนาทักษะ Aim ของคุณ</h1>
+            <p>แหล่งรวมเทคนิคการฝึก aim, การ warm up, และการตั้งค่า gaming ที่ดีที่สุดของฉัน</p>
+        </div>
+    </section>
+
+    <section id="warm-up">
+        <div class="container">
+            <h2 class="section-title">การ Warm Up ก่อนเล่น</h2>
+            <p class="section-description">การ warm up ที่ดีจะช่วยให้กล้ามเนื้อและประสาทของคุณพร้อมสำหรับการเล่นเกม ลองทำตามคำแนะนำด้านล่าง:</p>
+            
+            <div class="card-container">
+                <div class="card">
+                    <div class="card-header">Wrist & Arm Warm Up</div>
+                    <div class="card-body">
+                        <h3>แบบฝึกการ Warm Up ข้อมือและแขน</h3>
+                        <p>ทำการยืดกล้ามเนื้อตามลำดับต่อไปนี้:</p>
+                        <ul>
+                            <li><strong>ท่าที่ 1: จับข้อมือ</strong>
+                                <ul>
+                                    <li>จับข้อมือขวาด้วยมือซ้าย</li>
+                                    <li>ค่อยๆ ดันข้อมือลง ค้างไว้ 15 วินาที</li>
+                                    <li>ดันขึ้น ค้างไว้ 15 วินาที</li>
+                                    <li>ทำซ้ำกับข้อมือซ้าย</li>
+                                </ul>
+                            </li>
+                            <li><strong>ท่าที่ 2: หมุนข้อมือ</strong>
+                                <ul>
+                                    <li>หมุนข้อมือเป็นวงกลมตามเข็มนาฬิกา 10 ครั้ง</li>
+                                    <li>หมุนทวนเข็มนาฬิกา 10 ครั้ง</li>
+                                    <li>ทำพร้อมกันทั้งสองข้าง</li>
+                                </ul>
+                            </li>
+                            <li><strong>ท่าที่ 3: ยืดนิ้ว</strong>
+                                <ul>
+                                    <li>กางนิ้วออกให้กว้างที่สุด 5 วินาที</li>
+                                    <li>กำมือแน่น 5 วินาที</li>
+                                    <li>ทำซ้ำ 10 ครั้ง</li>
+                                </ul>
+                            </li>
+                            <li><strong>ท่าที่ 4: ยืดแขน</strong>
+                                <ul>
+                                    <li>เหยียดแขนตรงไปด้านหน้า</li>
+                                    <li>ใช้มืออีกข้างดึงนิ้วเข้าหาตัว ค้าง 15 วินาที</li>
+                                    <li>ทำสลับทั้งสองข้าง</li>
+                                </ul>
+                            </li>
+                        </ul>
+                        <p><strong>คำแนะนำ:</strong> ทำการยืดเบาๆ อย่าออกแรงมากเกินไป หากรู้สึกเจ็บให้หยุดทันที</p>
+                        <div class="tags">
+                            <span class="tag">Physical</span>
+                            <span class="tag">Warm Up</span>
+                            <span class="tag">5-10 นาที</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">Tracking Exercise</div>
+                    <div class="card-body">
+                        <h3>ฝึกการติดตามเป้าหมาย</h3>
+                        <p>เริ่มต้นด้วยการฝึกติดตามเป้าหมายเพื่อให้สมองและกล้ามเนื้อเริ่มทำงานประสานกัน:</p>
+                        <ul>
+                            <li>ใช้โหมด Tracking ใน Aim Lab เป็นเวลา 5 นาที</li>
+                            <li>ตั้งความเร็วที่ 50% ของความเร็วปกติ</li>
+                            <li>ค่อยๆ เพิ่มความเร็วเป้าหมายหลังจากรู้สึกผ่อนคลายแล้ว</li>
+                        </ul>
+                        <div class="tags">
+                            <span class="tag">Tracking</span>
+                            <span class="tag">5 นาที</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">Flicking Practice</div>
+                    <div class="card-body">
+                        <h3>ฝึกการกระตุกเม้าส์แบบแม่นยำ</h3>
+                        <p>ฝึกการกระตุกเม้าส์เพื่อกระตุ้นประสาทและกล้ามเนื้อให้พร้อมสำหรับการเล่นแบบเร็ว:</p>
+                        <ul>
+                            <li>ใช้โหมด Gridshot ใน Aim Lab เป็นเวลา 5 นาที</li>
+                            <li>เน้นความแม่นยำมากกว่าความเร็ว</li>
+                            <li>พยายามให้ hit rate อยู่ที่อย่างน้อย 90%</li>
+                        </ul>
+                        <div class="tags">
+                            <span class="tag">Flicking</span>
+                            <span class="tag">5 นาที</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">Complete Warm Up Routine</div>
+                <div class="card-body">
+                    <h3>การ Warm Up แบบเต็มรูปแบบ (15-20 นาที)</h3>
+                    <ol>
+                        <li><strong>กายภาพ (3-5 นาที)</strong> - ตามที่อธิบายข้างต้น</li>
+                        <li><strong>Tracking Practice (5 นาที)</strong> - เริ่มที่ความเร็วต่ำและค่อยๆ เพิ่มขึ้น</li>
+                        <li><strong>Flicking Exercise (5 นาที)</strong> - Gridshot หรือ Sixshot เพื่อฝึกการกระตุกเม้าส์</li>
+                        <li><strong>Microadjustments (3-5 นาที)</strong> - เล่นโหมด Microshot เพื่อฝึกการปรับเม้าส์เล็กน้อย</li>
+                        <li><strong>Reaction Time (2-3 นาที)</strong> - เล่นโหมด Spidershot หรือ Reflex เพื่อกระตุ้นเวลาตอบสนอง</li>
+                    </ol>
+                    <p><strong>คำแนะนำ:</strong> ทำการ warm up นี้ก่อนเล่นเกมเสมอเพื่อประสิทธิภาพสูงสุด</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="aim-training">
+        <div class="container">
+            <h2 class="section-title">เทคนิคการฝึก Aim ประเภทต่างๆ</h2>
+            
+            <div class="card-container">
+                <div class="card">
+                    <div class="card-header">Precision Aim</div>
+                    <div class="card-body">
+                        <h3>การฝึกความแม่นยำ</h3>
+                        <p>เน้นการยิงที่แม่นยำมากกว่าความเร็ว:</p>
+                        <ul>
+                            <li><strong>Microshot</strong> - ฝึกยิงเป้าหมายขนาดเล็ก 15 นาที</li>
+                            <li><strong>Headshot Practice</strong> - ตั้งค่าบอทเป็นนิ่งและฝึกยิงหัว 15 นาที</li>
+                            <li><strong>Dot Precision</strong> - ฝึกเล็งกลางจุดเล็กๆ โดยใช้ sensitivity ปกติ 15 นาที</li>
+                        </ul>
+                        <p><strong>เคล็ดลับ:</strong> ลด sensitivity ลง 10-20% จากที่ใช้ปกติเพื่อฝึกความแม่นยำ</p>
+                        <div class="tags">
+                            <span class="tag">Precision</span>
+                            <span class="tag">Accuracy</span>
+                            <span class="tag">45 นาที</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">Reflex Aim</div>
+                    <div class="card-body">
+                        <h3>การฝึกปฏิกิริยา</h3>
+                        <p>พัฒนาความเร็วในการตอบสนองต่อเป้าหมาย:</p>
+                        <ul>
+                            <li><strong>Spidershot</strong> - ฝึกยิงเป้าหมายที่ปรากฏขึ้นอย่างรวดเร็ว 10 นาที</li>
+                            <li><strong>Reaction Training</strong> - ใช้เว็บไซต์ Human Benchmark เพื่อฝึกเวลาตอบสนอง 5 นาที</li>
+                            <li><strong>Flick Shot Training</strong> - ฝึกยิงแบบกระตุกเม้าส์เร็วๆ ในโหมด Gridshot 10 นาที</li>
+                        </ul>
+                        <p><strong>เคล็ดลับ:</strong> พยายามผ่อนคลายข้อมือและแขน ไม่เกร็งขณะทำการยิง</p>
+                        <div class="tags">
+                            <span class="tag">Reflexes</span>
+                            <span class="tag">Speed</span>
+                            <span class="tag">25 นาที</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">Tracking Aim</div>
+                    <div class="card-body">
+                        <h3>การฝึกการติดตามเป้าหมาย</h3>
+                        <p>พัฒนาความสามารถในการติดตามเป้าหมายที่เคลื่อนที่:</p>
+                        <ul>
+                            <li><strong>Strafetrack</strong> - ฝึกยิงเป้าหมายที่เคลื่อนที่ซ้ายขวา 10 นาที</li>
+                            <li><strong>Circletrack</strong> - ฝึกยิงเป้าหมายที่เคลื่อนที่เป็นวงกลม 10 นาที</li>
+                            <li><strong>Smoothness Training</strong> - ฝึกการเคลื่อนเม้าส์แบบนุ่มนวล โดยลด sensitivity ลง 20% 10 นาที</li>
+                        </ul>
+                        <p><strong>เคล็ดลับ:</strong> ใช้กล้ามเนื้อทั้งแขนไม่ใช่แค่ข้อมือในการติดตามเป้าหมายระยะไกล</p>
+                        <div class="tags">
+                            <span class="tag">Tracking</span>
+                            <span class="tag">Consistency</span>
+                            <span class="tag">30 นาที</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">Advanced Aim Training Tips</div>
+                <div class="card-body">
+                    <h3>เทคนิคขั้นสูงในการฝึก Aim</h3>
+                    <ul>
+                        <li><strong>การฝึกข้ามวัน</strong> - ฝึกคนละวิธีในแต่ละวัน เช่น วันจันทร์ฝึก Precision, วันอังคารฝึก Tracking</li>
+                        <li><strong>การฝึกที่ความเร็วแตกต่าง</strong> - สลับระหว่างการฝึกที่ sensitivity สูงและต่ำกว่าปกติ</li>
+                        <li><strong>การบันทึกสถิติ</strong> - จดบันทึกคะแนนและความก้าวหน้าเพื่อติดตามการพัฒนา</li>
+                        <li><strong>การฝึกโดยไม่มี crosshair</strong> - ฝึกยิงโดยไม่มีเครื่องหมายเล็งเพื่อพัฒนาความรู้สึกของมือ</li>
+                        <li><strong>การฝึกในขณะเหนื่อย</strong> - ลองฝึกหลังจากเล่นไปแล้ว 1-2 ชั่วโมงเพื่อพัฒนาความทนทาน</li>
+                    </ul>
+                    <p><strong>คำเตือน:</strong> อย่าฝึกนานเกินไปจนเมื่อยล้า พักเมื่อรู้สึกว่าประสิทธิภาพลดลง</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="routines">
+        <div class="container">
+            <h2 class="section-title">ตารางการฝึกประจำสัปดาห์</h2>
+            
+            <div class="card-container">
+                <div class="card">
+                    <div class="card-header">Routine สำหรับผู้เริ่มต้น</div>
+                    <div class="card-body">
+                        <h3>สำหรับผู้ที่เพิ่งเริ่มต้น (30 นาทีต่อวัน)</h3>
+                        <ul>
+                            <li><strong>วันจันทร์</strong> - 5 นาที warm up, 15 นาที Gridshot, 10 นาที Strafetrack</li>
+                            <li><strong>วันอังคาร</strong> - 5 นาที warm up, 15 นาที Microshot, 10 นาที Sixshot</li>
+                            <li><strong>วันพุธ</strong> - 5 นาที warm up, 25 นาที เล่นเกมที่ชอบ</li>
+                            <li><strong>วันพฤหัสบดี</strong> - 5 นาที warm up, 15 นาที Spidershot, 10 นาที Circletrack</li>
+                            <li><strong>วันศุกร์</strong> - 5 นาที warm up, 25 นาที เล่นเกมที่ชอบ</li>
+                            <li><strong>วันเสาร์-อาทิตย์</strong> - ผ่อนคลาย เล่นเกมตามปกติ</li>
+                        </ul>
+                        <p><strong>เป้าหมาย:</strong> สร้างความสม่ำเสมอและความเคยชินกับการฝึก</p>
+                        <div class="tags">
+                            <span class="tag">Beginner</span>
+                            <span class="tag">30 นาทีต่อวัน</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">Routine สำหรับผู้มีประสบการณ์</div>
+                    <div class="card-body">
+                        <h3>สำหรับผู้ที่มีประสบการณ์ (45-60 นาทีต่อวัน)</h3>
+                        <ul>
+                            <li><strong>วันจันทร์: Precision Day</strong> - 10 นาที warm up, 20 นาที Microshot, 15 นาที Headshot practice, 15 นาที Dot Precision</li>
+                            <li><strong>วันอังคาร: Tracking Day</strong> - 10 นาที warm up, 15 นาที Strafetrack, 15 นาที Circletrack, 15 นาที Smoothness Training</li>
+                            <li><strong>วันพุธ: Reflexes Day</strong> - 10 นาที warm up, 15 นาที Spidershot, 15 นาที Reaction Training, 15 นาที Gridshot</li>
+                            <li><strong>วันพฤหัสบดี: Mixed Day</strong> - 10 นาที warm up, 10 นาที จากแต่ละประเภท (Precision, Tracking, Reflexes)</li>
+                            <li><strong>วันศุกร์: Game-specific Training</strong> - 10 นาที warm up, 35 นาที ฝึกสถานการณ์เฉพาะในเกมที่เล่น</li>
+                            <li><strong>วันเสาร์-อาทิตย์</strong> - warm up เท่านั้น แล้วเล่นเกมตามปกติ</li>
+                        </ul>
+                        <p><strong>เป้าหมาย:</strong> พัฒนาทักษะเฉพาะด้านอย่างลึกซึ้งและสร้างสมดุล</p>
+                        <div class="tags">
+                            <span class="tag">Intermediate</span>
+                            <span class="tag">45-60 นาทีต่อวัน</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">Routine สำหรับผู้เล่นขั้นสูง</div>
+                    <div class="card-body">
+                        <h3>สำหรับผู้เล่นขั้นสูง (60-90 นาทีต่อวัน)</h3>
+                        <p>ตารางการฝึกแบบบรรลุขีดสุด เน้นการพัฒนาทุกด้าน:</p>
+                        <ul>
+                            <li><strong>วันจันทร์-วันศุกร์:</strong></li>
+                            <ul>
+                                <li>10 นาที warm up ทางกายภาพและเม้าส์</li>
+                                <li>20 นาที ฝึกจุดอ่อนจากวันก่อน</li>
+                                <li>20 นาที ฝึกทักษะที่เป็นจุดแข็ง</li>
+                                <li>15 นาที ฝึกด้วย sensitivity ที่ไม่คุ้นเคย</li>
+                                <li>15 นาที ฝึกสถานการณ์จำลองเฉพาะเกม</li>
+                                <li>10 นาที บันทึกและวิเคราะห์ผลการฝึก</li>
+                            </ul>
+                            <li><strong>วันเสาร์-อาทิตย์:</strong></li>
+                            <ul>
+                                <li>15 นาที warm up แบบเต็มรูปแบบ</li>
+                                <li>เล่นเกมแข่งขันหรือฝึกเป็นทีม</li>
+                                <li>15 นาที หลังเล่นเพื่อทบทวนและจดบันทึก</li>
+                            </ul>
+                        </ul>
+                        <p><strong>เป้าหมาย:</strong> ปรับแต่งทักษะให้สมบูรณ์และสร้างความทนทานทางจิตใจ</p>
+                        <div class="tags">
+                            <span class="tag">Advanced</span>
+                            <span class="tag">60-90 นาทีต่อวัน</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="settings">
+        <div class="container">
+            <h2 class="section-title">การตั้งค่าเกมและอุปกรณ์ของฉัน</h2>
+            
+            <div class="settings-box">
+                <h3>อุปกรณ์ Gaming</h3>
+                <div class="settings-row">
+                    <span class="setting-name">เม้าส์:</span>
+                    <span class="setting-value">Logitech G Pro X Superlight</span>
+                </div>
+                <div class="settings-row">
+                    <span class="setting-name">แผ่นรองเม้าส์:</span>
+                    <span class="setting-value">Artisan Hien FX XSOFT XL</span>
+                </div>
+                <div class="settings-row">
+                    <span class="setting-name">คีย์บอร์ด:</span>
+                    <span class="setting-value">Ducky One 3 TKL (Cherry MX Red)</span>
+                </div>
+                <div class="settings-row">
+                    <span class="setting-name">หูฟัง:</span>
+                    <span class="setting-value">HyperX Cloud Alpha</span>
+                </div>
+                <div class="settings-row">
+                    <span class="setting-name">จอมอนิเตอร์:</span>
+                    <span class="setting-value">ZOWIE XL2546K 240Hz</span>
+                </div>
+            </div>
+            
+            <div class="settings-box">
+                <h3>การตั้งค่าเกม</h3>
+                <div class="settings-row">
+                    <span class="setting-name">Sensitivity:</span>
+                    <span class="setting-value">800 DPI / 0.3 In-game</span>
+                </div>
+                <div class="settings-row">
+                    <span class="setting-name">eDPI:</span>
+                    <span class="setting-value">240</span>
+                </div>
+                <div class="settings-row">
+                    <span class="setting-name">FOV:</span>
+                    <span class="setting-value">103</span>
+                </div>
+                <div class="settings-row">
+                    <span class="setting-name">Resolution:</span>
+                    <span class="setting-value">1920x1080 (16:9)</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="references">
+        <div class="container">
+            <h2 class="section-title">แหล่งอ้างอิงและเอกสารเพิ่มเติม</h2>
+            <div class="card">
+                <div class="card-header">References & Resources</div>
+                <div class="card-body">
+                    <ul class="reference-list">
+                        <li>
+                            <strong>Aiming Fundamentals Guide:</strong>
+                            <a href="https://drive.google.com/file/d/1JKKSBWXHM-V5C9gMhVFWQgsHwVLcVMgb/view" target="_blank" rel="noopener noreferrer">
+                                Warm-up Exercise Documentation <i class="external-link-icon">↗</i>
+                            </a>
+                        </li>
+                        <li>
+                            <strong>Additional Resources:</strong>
+                            <ul>
+                                <li>
+                                    <a href="https://www.humanbenchmark.com/" target="_blank" rel="noopener noreferrer">
+                                        Human Benchmark - Reaction Time Training <i class="external-link-icon">↗</i>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="https://www.aimlab.gg/" target="_blank" rel="noopener noreferrer">
+                                        Aim Lab - Free Aim Trainer <i class="external-link-icon">↗</i>
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                    <p class="reference-note">
+                        <strong>หมายเหตุ:</strong> เอกสารและแหล่งข้อมูลทั้งหมดใช้เพื่อการศึกษาและพัฒนาทักษะเท่านั้น
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // ซ่อน loading screen หลังจากโหลดเสร็จ
+            const loading = document.querySelector('.loading');
+            setTimeout(() => {
+                loading.style.opacity = '0';
+                setTimeout(() => {
+                    loading.style.display = 'none';
+                }, 500);
+            }, 1000);
+
+            // เพิ่ม animation delay ให้กับ settings rows
+            const settingsRows = document.querySelectorAll('.settings-row');
+            settingsRows.forEach((row, index) => {
+                row.style.animationDelay = `${index * 0.1}s`;
+            });
+        });
+    </script>
+</body>
+</html>
