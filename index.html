@@ -262,12 +262,12 @@
         <header>
             <h1>Happy Birthday!</h1> 
             <div class="birthday-cake">🎂</div>
-            <p>ส่งคำอวยพรของคุณมาได้เลย</p>
+            <p>ส่งคำอวยพรของคุณมาได้เลย ตรงเน๊~</p>
             
         </header>
         
         <div class="wishes-form">
-            <h2>ฝากคำอวยพรวันเกิด</h2>
+            <h2>ฝากคำอวยพรวันเกิด Wish Here!!</h2>
             <div class="form-group">
                 <textarea id="wish-text" placeholder="เขียนคำอวยพรของคุณที่นี่..." maxlength="200"></textarea>
                 <div class="character-counter"><span id="char-count">0</span>/200</div>
@@ -388,7 +388,7 @@
             if (!validateForm()) return;
 
             const wishText = document.getElementById("wish-text").value;
-            const wishName = document.getElementById("wish-name").value || "ผู้ไม่ประสงค์ออกนาม";
+            const wishName = document.getElementById("wish-name").value || "Anonymous";
             const timestamp = new Date().toISOString();
             
             // Save to log
