@@ -256,6 +256,38 @@
             transform: scale(1.1);
         }
     </style>
+    
+    <!-- เพิ่ม Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.x.x/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.x.x/firebase-database.js"></script>
+    
+    <!-- Firebase SDK -->
+    <script type="module">
+  // Import the functions you need from the SDKs you need
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.7.3/firebase-app.js";
+  import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.7.3/firebase-analytics.js";
+  import { getDatabase, ref as dbRef, push as dbPush, onValue as dbOnValue } from "https://www.gstatic.com/firebasejs/11.7.3/firebase-database.js";
+  // TODO: Add SDKs for Firebase products that you want to use
+  // https://firebase.google.com/docs/web/setup#available-libraries
+
+  // Your web app's Firebase configuration
+  // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+  const firebaseConfig = {
+    apiKey: "AIzaSyBieetN-F_55LtCJdJMxEdf2ePXo1L_TSs",
+    authDomain: "hbd-to-me-e8977.firebaseapp.com",
+    databaseURL: "https://hbd-to-me-e8977-default-rtdb.asia-southeast1.firebasedatabase.app",
+    projectId: "hbd-to-me-e8977",
+    storageBucket: "hbd-to-me-e8977.firebasestorage.app",
+    messagingSenderId: "921877128136",
+    appId: "1:921877128136:web:314fbb393eb736b2a416fd",
+    measurementId: "G-64SBHBFPET"
+  };
+
+  // Initialize Firebase
+  const app = initializeApp(firebaseConfig);
+  const analytics = getAnalytics(app);
+  const database = getDatabase(app);
+</script>
 </head>
 <body>
     <div class="container">
@@ -332,18 +364,38 @@
         }
         
         // บันทึกคำอวยพรลง log
-        function saveWishToLog(wishText, wishName, timestamp) {
-            // Get existing wishes from localStorage
+        async function saveWishToLog(wishText, wishName, timestamp) {
+            try {
+                // Save to Firebase
+                const wishesRef = dbRef(database, 'wishes');
+                await dbPush(wishesRef, {
+                    text: wishText,
+                    author: wishName,
+                    timestamp: timestamp
+                });
+                
+                // Also save to localStorage as backup
+                let wishes = JSON.parse(localStorage.getItem('birthdayWishes') || '[]');
+                wishes.push({
+                    text: wishText,
+                    author: wishName,
+                    timestamp: timestamp
+                });
+                localStorage.setItem('birthdayWishes', JSON.stringify(wishes));
+            } catch (error) {
+                console.error("Error saving wish:", error);
+                // If Firebase fails, save to localStorage only
+                saveToLocalStorageOnly(wishText, wishName, timestamp);
+            }
+        }
+        
+        function saveToLocalStorageOnly(wishText, wishName, timestamp) {
             let wishes = JSON.parse(localStorage.getItem('birthdayWishes') || '[]');
-            
-            // Add new wish
             wishes.push({
                 text: wishText,
                 author: wishName,
                 timestamp: timestamp
             });
-            
-            // Save back to localStorage
             localStorage.setItem('birthdayWishes', JSON.stringify(wishes));
         }
         
@@ -427,24 +479,31 @@
         
         // โหลดคำอวยพรเมื่อหน้าโหลด
         function loadWishes() {
-            const wishes = JSON.parse(localStorage.getItem('birthdayWishes') || '[]');
-            const wishesContainer = document.getElementById("wishes-list");
-            
-            // Clear default wish
-            wishesContainer.innerHTML = '';
-            
-            // Display all wishes
-            wishes.reverse().forEach(wish => {
-                const wishElement = document.createElement("div");
-                wishElement.classList.add("wish");
+            const wishesRef = dbRef(database, 'wishes');
+            dbOnValue(wishesRef, (snapshot) => {
+                const wishesContainer = document.getElementById("wishes-list");
+                wishesContainer.innerHTML = '';
                 
-                wishElement.innerHTML = `
-                    <div class="wish-content">${wish.text}</div>
-                    <div class="wish-author">- ${wish.author}</div>
-                    <div class="wish-time" style="font-size: 0.8rem; color: var(--text-secondary);">${new Date(wish.timestamp).toLocaleString('th-TH')}</div>
-                `;
+                const wishes = [];
+                snapshot.forEach((childSnapshot) => {
+                    wishes.push({
+                        id: childSnapshot.key,
+                        ...childSnapshot.val()
+                    });
+                });
                 
-                wishesContainer.appendChild(wishElement);
+                wishes.reverse().forEach(wish => {
+                    const wishElement = document.createElement("div");
+                    wishElement.classList.add("wish");
+                    wishElement.innerHTML = `
+                        <div class="wish-content">${wish.text}</div>
+                        <div class="wish-author">- ${wish.author}</div>
+                        <div class="wish-time" style="font-size: 0.8rem; color: var(--text-secondary);">
+                            ${new Date(wish.timestamp).toLocaleString('th-TH')}
+                        </div>
+                    `;
+                    wishesContainer.appendChild(wishElement);
+                });
             });
         }
         
