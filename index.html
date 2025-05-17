@@ -367,8 +367,8 @@
         async function saveWishToLog(wishText, wishName, timestamp) {
             try {
                 // Save to Firebase
-                const wishesRef = dbRef(database, 'wishes');
-                await dbPush(wishesRef, {
+                const wishesRef = window.firebaseRef(window.database, 'wishes');
+                await window.firebasePush(wishesRef, {
                     text: wishText,
                     author: wishName,
                     timestamp: timestamp
@@ -382,10 +382,13 @@
                     timestamp: timestamp
                 });
                 localStorage.setItem('birthdayWishes', JSON.stringify(wishes));
+                
+                return true;
             } catch (error) {
                 console.error("Error saving wish:", error);
                 // If Firebase fails, save to localStorage only
                 saveToLocalStorageOnly(wishText, wishName, timestamp);
+                return false;
             }
         }
         
@@ -479,31 +482,59 @@
         
         // โหลดคำอวยพรเมื่อหน้าโหลด
         function loadWishes() {
-            const wishesRef = dbRef(database, 'wishes');
-            dbOnValue(wishesRef, (snapshot) => {
-                const wishesContainer = document.getElementById("wishes-list");
-                wishesContainer.innerHTML = '';
-                
-                const wishes = [];
-                snapshot.forEach((childSnapshot) => {
-                    wishes.push({
-                        id: childSnapshot.key,
-                        ...childSnapshot.val()
+            try {
+                const wishesRef = window.firebaseRef(window.database, 'wishes');
+                window.firebaseOnValue(wishesRef, (snapshot) => {
+                    const wishesContainer = document.getElementById("wishes-list");
+                    wishesContainer.innerHTML = '';
+                    
+                    const wishes = [];
+                    snapshot.forEach((childSnapshot) => {
+                        wishes.push({
+                            id: childSnapshot.key,
+                            ...childSnapshot.val()
+                        });
+                    });
+                    
+                    // Sort wishes by timestamp in descending order
+                    wishes.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+                    
+                    wishes.forEach(wish => {
+                        const wishElement = document.createElement("div");
+                        wishElement.classList.add("wish");
+                        wishElement.innerHTML = `
+                            <div class="wish-content">${wish.text}</div>
+                            <div class="wish-author">- ${wish.author}</div>
+                            <div class="wish-time" style="font-size: 0.8rem; color: var(--text-secondary);">
+                                ${new Date(wish.timestamp).toLocaleString('th-TH')}
+                            </div>
+                        `;
+                        wishesContainer.appendChild(wishElement);
                     });
                 });
-                
-                wishes.reverse().forEach(wish => {
-                    const wishElement = document.createElement("div");
-                    wishElement.classList.add("wish");
-                    wishElement.innerHTML = `
-                        <div class="wish-content">${wish.text}</div>
-                        <div class="wish-author">- ${wish.author}</div>
-                        <div class="wish-time" style="font-size: 0.8rem; color: var(--text-secondary);">
-                            ${new Date(wish.timestamp).toLocaleString('th-TH')}
-                        </div>
-                    `;
-                    wishesContainer.appendChild(wishElement);
-                });
+            } catch (error) {
+                console.error("Error loading wishes:", error);
+                // If Firebase fails, load from localStorage
+                const localWishes = JSON.parse(localStorage.getItem('birthdayWishes') || '[]');
+                displayLocalWishes(localWishes);
+            }
+        }
+        
+        function displayLocalWishes(localWishes) {
+            const wishesContainer = document.getElementById("wishes-list");
+            wishesContainer.innerHTML = '';
+            
+            localWishes.forEach(wish => {
+                const wishElement = document.createElement("div");
+                wishElement.classList.add("wish");
+                wishElement.innerHTML = `
+                    <div class="wish-content">${wish.text}</div>
+                    <div class="wish-author">- ${wish.author}</div>
+                    <div class="wish-time" style="font-size: 0.8rem; color: var(--text-secondary);">
+                        ${new Date(wish.timestamp).toLocaleString('th-TH')}
+                    </div>
+                `;
+                wishesContainer.appendChild(wishElement);
             });
         }
         
